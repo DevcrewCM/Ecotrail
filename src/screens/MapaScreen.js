@@ -6,23 +6,23 @@ const CHECKPOINTS = [
   {
     id: 1,
     title: 'Inicio',
-    description: 'Punto de partida de la ruta',
-    latitude: 40.4168,
-    longitude: -3.7038,
+    description: 'Plaza del Castillo',
+    latitude: 42.8125,
+    longitude: -1.6458,
   },
   {
     id: 2,
     title: 'Checkpoint 1',
-    description: 'Mirador del bosque',
-    latitude: 40.4220,
-    longitude: -3.7100,
+    description: 'Parque de la Taconera',
+    latitude: 42.8160,
+    longitude: -1.6495,
   },
   {
     id: 3,
     title: 'Meta',
-    description: 'Punto final de la ruta',
-    latitude: 40.4280,
-    longitude: -3.7160,
+    description: 'Paseo del Arga',
+    latitude: 42.8220,
+    longitude: -1.6420,
   },
 ];
 
@@ -34,10 +34,10 @@ export default function MapaScreen({ navigation, route }) {
       <MapView
         style={styles.map}
         initialRegion={{
-          latitude: 40.4168,
-          longitude: -3.7038,
-          latitudeDelta: 0.02,
-          longitudeDelta: 0.02,
+          latitude: 42.8125,
+          longitude: -1.6458,
+          latitudeDelta: 0.03,
+          longitudeDelta: 0.03,
         }}
       >
         {CHECKPOINTS.map((cp) => (
@@ -51,7 +51,7 @@ export default function MapaScreen({ navigation, route }) {
       </MapView>
 
       <TouchableOpacity style={styles.cameraBtn} onPress={() => {}}>
-        <Text style={styles.cameraBtnText}>📷 Cámara</Text>
+        <Text style={styles.cameraBtnText}>Cámara</Text>
       </TouchableOpacity>
     </View>
   );

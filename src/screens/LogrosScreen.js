@@ -2,10 +2,10 @@ import React from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
 
 const LOGROS = [
-  { id: '1', titulo: 'Primer Paso', descripcion: 'Completa tu primera ruta', pasos: 1000, icono: '👣', desbloqueado: true },
-  { id: '2', titulo: 'Explorador', descripcion: 'Completa 5 rutas distintas', pasos: 5000, icono: '🧭', desbloqueado: false },
-  { id: '3', titulo: 'Maratonista Verde', descripcion: 'Acumula 20 km en total', pasos: 10000, icono: '🏅', desbloqueado: false },
-  { id: '4', titulo: 'Fotógrafo Natural', descripcion: 'Captura 10 fotos en ruta', pasos: 0, icono: '📸', desbloqueado: false },
+  { id: '1', titulo: 'Primer Paso', descripcion: 'Completa tu primera ruta', pasos: 1000, desbloqueado: true },
+  { id: '2', titulo: 'Explorador', descripcion: 'Completa 5 rutas distintas', pasos: 5000, desbloqueado: false },
+  { id: '3', titulo: 'Maratonista Verde', descripcion: 'Acumula 20 km en total', pasos: 10000, desbloqueado: false },
+  { id: '4', titulo: 'Fotógrafo Natural', descripcion: 'Captura 10 fotos en ruta', pasos: 0, desbloqueado: false },
 ];
 
 export default function LogrosScreen({ route }) {
@@ -13,7 +13,7 @@ export default function LogrosScreen({ route }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🏆 Logros</Text>
+      <Text style={styles.title}>Logros</Text>
       <Text style={styles.subtitle}>{ruta.nombre}</Text>
       <FlatList
         data={LOGROS}
@@ -21,7 +21,6 @@ export default function LogrosScreen({ route }) {
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
           <View style={[styles.card, !item.desbloqueado && styles.cardLocked]}>
-            <Text style={styles.cardIcon}>{item.icono}</Text>
             <View style={styles.cardInfo}>
               <Text style={styles.cardTitle}>{item.titulo}</Text>
               <Text style={styles.cardDesc}>{item.descripcion}</Text>
@@ -29,7 +28,6 @@ export default function LogrosScreen({ route }) {
                 <Text style={styles.cardPasos}>{item.pasos.toLocaleString()} pasos</Text>
               )}
             </View>
-            <Text style={styles.lock}>{item.desbloqueado ? '✅' : '🔒'}</Text>
           </View>
         )}
       />
@@ -72,9 +70,6 @@ const styles = StyleSheet.create({
   cardLocked: {
     opacity: 0.5,
   },
-  cardIcon: {
-    fontSize: 34,
-  },
   cardInfo: {
     flex: 1,
   },
@@ -93,8 +88,5 @@ const styles = StyleSheet.create({
     fontSize: 11,
     marginTop: 4,
     fontWeight: '600',
-  },
-  lock: {
-    fontSize: 20,
   },
 });

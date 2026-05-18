@@ -2,9 +2,9 @@ import React from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
 
 const FOTOS_MOCK = [
-  { id: '1', lugar: 'Mirador Norte', fecha: '12 May 2026', icono: '🌅' },
-  { id: '2', lugar: 'Puente de Piedra', fecha: '10 May 2026', icono: '🌉' },
-  { id: '3', lugar: 'Cascada del Bosque', fecha: '5 May 2026', icono: '💦' },
+  { id: '1', lugar: 'Mirador Norte', fecha: '12 May 2026' },
+  { id: '2', lugar: 'Puente de Piedra', fecha: '10 May 2026' },
+  { id: '3', lugar: 'Cascada del Bosque', fecha: '5 May 2026' },
 ];
 
 export default function GaleriaScreen({ route }) {
@@ -12,7 +12,7 @@ export default function GaleriaScreen({ route }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>📷 Galería</Text>
+      <Text style={styles.title}>Galería</Text>
       <Text style={styles.subtitle}>{ruta.nombre}</Text>
       <FlatList
         data={FOTOS_MOCK}
@@ -20,7 +20,6 @@ export default function GaleriaScreen({ route }) {
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
           <View style={styles.card}>
-            <Text style={styles.cardIcon}>{item.icono}</Text>
             <View>
               <Text style={styles.cardLugar}>{item.lugar}</Text>
               <Text style={styles.cardFecha}>{item.fecha}</Text>
@@ -63,9 +62,6 @@ const styles = StyleSheet.create({
     gap: 16,
     borderWidth: 1,
     borderColor: '#334155',
-  },
-  cardIcon: {
-    fontSize: 36,
   },
   cardLugar: {
     color: '#f1f5f9',

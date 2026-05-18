@@ -32,10 +32,8 @@ export default function LoginScreen({ navigation }) {
     }
     setLoading(true);
     try {
-      // Iniciar sesión con Firebase
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       
-      // Guardar un token simulado para la biometría (basado en el UID del usuario)
       const token = `token_firebase_${userCredential.user.uid}`;
       await saveSecureToken(token);
       
@@ -93,7 +91,7 @@ export default function LoginScreen({ navigation }) {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <View style={styles.card}>
-        <Text style={styles.logo}>🌿 EcoTrail</Text>
+        <Text style={styles.logo}>EcoTrail</Text>
         <Text style={styles.subtitle}>Tu aventura sostenible comienza aquí</Text>
 
         <TextInput
@@ -133,7 +131,7 @@ export default function LoginScreen({ navigation }) {
         </View>
 
         <TouchableOpacity style={styles.btnSecondary} onPress={handleBiometricLogin}>
-          <Text style={styles.btnSecondaryText}>🔒 Acceso Biométrico</Text>
+          <Text style={styles.btnSecondaryText}>Acceso Biométrico</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>

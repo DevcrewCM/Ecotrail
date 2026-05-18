@@ -8,11 +8,11 @@ import {
 } from 'react-native';
 
 const RUTAS = [
-  { id: '1', nombre: 'Ruta del Bosque Verde', distancia: '5.2 km', dificultad: 'Fácil', icono: '🌲' },
-  { id: '2', nombre: 'Sendero del Río Claro', distancia: '8.7 km', dificultad: 'Medio', icono: '💧' },
-  { id: '3', nombre: 'Cumbre del Águila', distancia: '14.3 km', dificultad: 'Difícil', icono: '🦅' },
-  { id: '4', nombre: 'Valle de las Flores', distancia: '3.1 km', dificultad: 'Fácil', icono: '🌸' },
-  { id: '5', nombre: 'Ladera Rocosa', distancia: '11.0 km', dificultad: 'Medio', icono: '🪨' },
+  { id: '1', nombre: 'Ruta del Bosque Verde', distancia: '5.2 km', dificultad: 'Fácil' },
+  { id: '2', nombre: 'Sendero del Río Claro', distancia: '8.7 km', dificultad: 'Medio' },
+  { id: '3', nombre: 'Cumbre del Águila', distancia: '14.3 km', dificultad: 'Difícil' },
+  { id: '4', nombre: 'Valle de las Flores', distancia: '3.1 km', dificultad: 'Fácil' },
+  { id: '5', nombre: 'Ladera Rocosa', distancia: '11.0 km', dificultad: 'Medio' },
 ];
 
 const DIFICULTAD_COLOR = {
@@ -35,7 +35,6 @@ export default function RutasScreen({ navigation }) {
             style={styles.card}
             onPress={() => navigation.navigate('RutaMenu', { ruta: item })}
           >
-            <Text style={styles.cardIcon}>{item.icono}</Text>
             <View style={styles.cardInfo}>
               <Text style={styles.cardName}>{item.nombre}</Text>
               <Text style={styles.cardDistance}>{item.distancia}</Text>
@@ -83,10 +82,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#334155',
-  },
-  cardIcon: {
-    fontSize: 32,
-    marginRight: 14,
   },
   cardInfo: {
     flex: 1,

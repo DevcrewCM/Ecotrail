@@ -2,11 +2,10 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 export default function RutaMenuScreen({ navigation, route }) {
-  const ruta = route.params?.ruta ?? { nombre: 'Ruta', icono: '🌿' };
+  const ruta = route.params?.ruta ?? { nombre: 'Ruta' };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.icon}>{ruta.icono}</Text>
       <Text style={styles.title}>{ruta.nombre}</Text>
       <Text style={styles.subtitle}>¿Qué quieres hacer?</Text>
 
@@ -14,7 +13,6 @@ export default function RutaMenuScreen({ navigation, route }) {
         style={[styles.btn, styles.btnPrimary]}
         onPress={() => navigation.navigate('Mapa', { ruta })}
       >
-        <Text style={styles.btnIcon}>🗺️</Text>
         <Text style={styles.btnText}>Empezar Ruta</Text>
       </TouchableOpacity>
 
@@ -22,7 +20,6 @@ export default function RutaMenuScreen({ navigation, route }) {
         style={[styles.btn, styles.btnSecondary]}
         onPress={() => navigation.navigate('Galeria', { ruta })}
       >
-        <Text style={styles.btnIcon}>📷</Text>
         <Text style={styles.btnText}>Galería</Text>
       </TouchableOpacity>
 
@@ -30,7 +27,6 @@ export default function RutaMenuScreen({ navigation, route }) {
         style={[styles.btn, styles.btnTertiary]}
         onPress={() => navigation.navigate('Logros', { ruta })}
       >
-        <Text style={styles.btnIcon}>🏆</Text>
         <Text style={styles.btnText}>Logros</Text>
       </TouchableOpacity>
     </View>
@@ -44,10 +40,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 24,
-  },
-  icon: {
-    fontSize: 64,
-    marginBottom: 12,
   },
   title: {
     fontSize: 24,
@@ -78,9 +70,6 @@ const styles = StyleSheet.create({
   },
   btnTertiary: {
     backgroundColor: '#f59e0b',
-  },
-  btnIcon: {
-    fontSize: 22,
   },
   btnText: {
     color: '#fff',
