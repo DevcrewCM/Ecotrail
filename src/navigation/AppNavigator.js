@@ -8,6 +8,8 @@ import RutaMenuScreen from '../screens/RutaMenuScreen';
 import MapaScreen from '../screens/MapaScreen';
 import GaleriaScreen from '../screens/GaleriaScreen';
 import LogrosScreen from '../screens/LogrosScreen';
+import CamaraScreen from '../screens/CamaraScreen';
+
 import usePedometer from '../hooks/usePedometer';
 
 const Stack = createStackNavigator();
@@ -57,6 +59,11 @@ export default function AppNavigator() {
           name="Logros"
           component={LogrosScreen}
           options={{ title: 'Logros' }}
+        />
+        <Stack.Screen
+          name="Camara"
+          component={CamaraScreen}
+          options={{ title: 'Camara'}}
         />
       </Stack.Navigator>
     </NavigationContainer>

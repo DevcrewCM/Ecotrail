@@ -50,7 +50,7 @@ export default function MapaScreen({ navigation, route }) {
         ))}
       </MapView>
 
-      <TouchableOpacity style={styles.cameraBtn} onPress={() => {}}>
+      <TouchableOpacity style={styles.cameraBtn} onPress={() => navigation.navigate('Camara', { ruta })}>
         <Text style={styles.cameraBtnText}>Cámara</Text>
       </TouchableOpacity>
     </View>
