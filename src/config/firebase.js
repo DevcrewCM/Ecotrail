@@ -1,5 +1,3 @@
-// Firebase config placeholder
-// Reemplaza estos valores con los de tu proyecto Firebase
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';

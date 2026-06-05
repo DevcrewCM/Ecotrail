@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,9 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
+import { useDispatch } from 'react-redux';
+import { logout } from '../store/slices/userSlice';
+import { deleteSecureToken } from '../utils/security';
 
 const RUTAS = [
   { id: '1', nombre: 'Ruta del Bosque Verde', distancia: '5.2 km', dificultad: 'Fácil' },
@@ -22,6 +25,25 @@ const DIFICULTAD_COLOR = {
 };
 
 export default function RutasScreen({ navigation }) {
+  const dispatch = useDispatch();
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          style={{ marginRight: 15 }}
+          onPress={async () => {
+            await deleteSecureToken();
+            dispatch(logout());
+            navigation.replace('Login');
+          }}
+        >
+          <Text style={{ color: '#f87171', fontWeight: 'bold', fontSize: 16 }}>Salir</Text>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, dispatch]);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Rutas Disponibles</Text>

@@ -1,35 +1,39 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { useSelector } from 'react-redux';
 
 const LOGROS = [
-  { id: '1', titulo: 'Primer Paso', descripcion: 'Completa tu primera ruta', pasos: 1000, desbloqueado: true },
-  { id: '2', titulo: 'Explorador', descripcion: 'Completa 5 rutas distintas', pasos: 5000, desbloqueado: false },
-  { id: '3', titulo: 'Maratonista Verde', descripcion: 'Acumula 20 km en total', pasos: 10000, desbloqueado: false },
-  { id: '4', titulo: 'Fotógrafo Natural', descripcion: 'Captura 10 fotos en ruta', pasos: 0, desbloqueado: false },
+  { id: '1', titulo: 'Primer Paso', descripcion: 'Completa tu primera ruta', pasos: 1000 },
+  { id: '2', titulo: 'Explorador', descripcion: 'Completa 5 rutas distintas', pasos: 5000 },
+  { id: '3', titulo: 'Maratonista Verde', descripcion: 'Acumula 20 km en total', pasos: 10000 },
+  { id: '4', titulo: 'Fotógrafo Natural', descripcion: 'Captura 10 fotos en ruta', pasos: 100 },
 ];
 
 export default function LogrosScreen({ route }) {
   const ruta = route.params?.ruta ?? { nombre: 'Ruta' };
+  const currentSteps = useSelector((state) => state.user.steps);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Logros</Text>
-      <Text style={styles.subtitle}>{ruta.nombre}</Text>
+      <Text style={styles.subtitle}>{ruta.nombre} - Llevas {currentSteps} pasos</Text>
       <FlatList
         data={LOGROS}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
-        renderItem={({ item }) => (
-          <View style={[styles.card, !item.desbloqueado && styles.cardLocked]}>
-            <View style={styles.cardInfo}>
-              <Text style={styles.cardTitle}>{item.titulo}</Text>
-              <Text style={styles.cardDesc}>{item.descripcion}</Text>
-              {item.pasos > 0 && (
-                <Text style={styles.cardPasos}>{item.pasos.toLocaleString()} pasos</Text>
-              )}
+        renderItem={({ item }) => {
+          const isDesbloqueado = currentSteps >= item.pasos;
+          
+          return (
+            <View style={[styles.card, !isDesbloqueado && styles.cardLocked]}>
+              <View style={styles.cardInfo}>
+                <Text style={styles.cardTitle}>{item.titulo}</Text>
+                <Text style={styles.cardDesc}>{item.descripcion}</Text>
+                <Text style={styles.cardPasos}>{item.pasos.toLocaleString()} pasos requeridos</Text>
+              </View>
             </View>
-          </View>
-        )}
+          );
+        }}
       />
     </View>
   );

@@ -8,10 +8,13 @@ import RutaMenuScreen from '../screens/RutaMenuScreen';
 import MapaScreen from '../screens/MapaScreen';
 import GaleriaScreen from '../screens/GaleriaScreen';
 import LogrosScreen from '../screens/LogrosScreen';
+import usePedometer from '../hooks/usePedometer';
 
 const Stack = createStackNavigator();
 
 export default function AppNavigator() {
+  usePedometer(); // Inicia el rastreo de pasos
+
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -31,7 +34,7 @@ export default function AppNavigator() {
         <Stack.Screen
           name="Rutas"
           component={RutasScreen}
-          options={{ title: '🌿 EcoTrail', headerLeft: null }}
+          options={{ title: 'EcoTrail', headerLeft: null }}
         />
         <Stack.Screen
           name="RutaMenu"
@@ -43,17 +46,17 @@ export default function AppNavigator() {
         <Stack.Screen
           name="Mapa"
           component={MapaScreen}
-          options={{ title: '🗺️ Mapa de Ruta' }}
+          options={{ title: 'Mapa de Ruta' }}
         />
         <Stack.Screen
           name="Galeria"
           component={GaleriaScreen}
-          options={{ title: '📷 Galería' }}
+          options={{ title: 'Galería' }}
         />
         <Stack.Screen
           name="Logros"
           component={LogrosScreen}
-          options={{ title: '🏆 Logros' }}
+          options={{ title: 'Logros' }}
         />
       </Stack.Navigator>
     </NavigationContainer>
