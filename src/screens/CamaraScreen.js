@@ -4,22 +4,25 @@ import {
   useCameraPermissions,
 } from "expo-camera";
 import { useRef, useState } from "react";
-import { Button, Pressable, StyleSheet, Text, View } from "react-native";
+import { Button, Pressable, StyleSheet, Text, View, Image } from "react-native";
 
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
-import { Asset, requestPermissionsAsync } from 'expo-media-library';
+import { useDispatch } from 'react-redux';
+import { addImage } from '../store/slices/imageSlice';
 
 
 export default function CamaraScreen({ navigation, route }) {
   const ruta = route.params?.ruta ?? { nombre: 'Ruta' };
+  const dispatch = useDispatch();
 
   const [permission, requestPermission] = useCameraPermissions();
   const ref = useRef(null);
   const [facing, setFacing] = useState("back");
 
+  const [uri, setUri] = useState("")
   if (!permission) {
     return (
       <View />
@@ -39,10 +42,9 @@ export default function CamaraScreen({ navigation, route }) {
 
   const takePicture = async () => {
     const photo = await ref.current?.takePictureAsync();
-
-    //SAVE DATA
-    
-    navigation.goBack()
+    dispatch(addImage({ uri:photo.uri, route_id:ruta.id }))
+    setUri(photo.uri)
+    //navigation.goBack()
     
   };
 

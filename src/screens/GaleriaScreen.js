@@ -1,5 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Image } from 'react-native';
+
+import { useSelector } from 'react-redux'
+import { retrieveImages } from '../store/slices/imageSlice';
+
 
 const FOTOS_MOCK = [
   { id: '1', lugar: 'Mirador Norte', fecha: '12 May 2026' },
@@ -7,22 +11,30 @@ const FOTOS_MOCK = [
   { id: '3', lugar: 'Cascada del Bosque', fecha: '5 May 2026' },
 ];
 
-export default function GaleriaScreen({ route }) {
+export default function GaleriaScreen({ navigation, route }) {
   const ruta = route.params?.ruta ?? { nombre: 'Ruta' };
+  const images = useSelector((state) => state.images)
+
+  const displayImages = Object.values(images).filter((image) => image.route_id == ruta.id)
+
+  console.log("preeee: " + JSON.stringify(images))
+  console.log("post: " + JSON.stringify(displayImages))
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Galería</Text>
       <Text style={styles.subtitle}>{ruta.nombre}</Text>
       <FlatList
-        data={FOTOS_MOCK}
+        data={displayImages}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
           <View style={styles.card}>
             <View>
-              <Text style={styles.cardLugar}>{item.lugar}</Text>
-              <Text style={styles.cardFecha}>{item.fecha}</Text>
+              <Image
+                style={styles.image}
+                source={item.uri}
+              />
             </View>
           </View>
         )}
@@ -72,5 +84,9 @@ const styles = StyleSheet.create({
     color: '#64748b',
     fontSize: 12,
     marginTop: 2,
+  },
+  image: {
+    width: 50,
+    height: 50,
   },
 });
