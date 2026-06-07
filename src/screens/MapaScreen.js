@@ -2,32 +2,11 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
-const CHECKPOINTS = [
-  {
-    id: 1,
-    title: 'Inicio',
-    description: 'Plaza del Castillo',
-    latitude: 42.8125,
-    longitude: -1.6458,
-  },
-  {
-    id: 2,
-    title: 'Checkpoint 1',
-    description: 'Parque de la Taconera',
-    latitude: 42.8160,
-    longitude: -1.6495,
-  },
-  {
-    id: 3,
-    title: 'Meta',
-    description: 'Paseo del Arga',
-    latitude: 42.8220,
-    longitude: -1.6420,
-  },
-];
-
 export default function MapaScreen({ navigation, route }) {
-  const ruta = route.params?.ruta ?? { nombre: 'Ruta' };
+  const ruta = route.params?.ruta ?? { 
+    nombre: 'Ruta', 
+    checkpoints: [] 
+  };
 
   return (
     <View style={styles.container}>
@@ -40,9 +19,9 @@ export default function MapaScreen({ navigation, route }) {
           longitudeDelta: 0.03,
         }}
       >
-        {CHECKPOINTS.map((cp) => (
+        {(ruta.checkpoints || []).map((cp, index) => (
           <Marker
-            key={cp.id}
+            key={cp.id || index.toString()}
             coordinate={{ latitude: cp.latitude, longitude: cp.longitude }}
             title={cp.title}
             description={cp.description}

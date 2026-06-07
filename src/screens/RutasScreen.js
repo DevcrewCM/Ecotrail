@@ -1,22 +1,18 @@
-import React, { useLayoutEffect } from 'react';
+import React, { useLayoutEffect, useState, useEffect } from 'react';
 import {
   View,
   Text,
   FlatList,
   TouchableOpacity,
   StyleSheet,
+  ActivityIndicator,
 } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { logout } from '../store/slices/userSlice';
 import { deleteSecureToken } from '../utils/security';
-
-const RUTAS = [
-  { id: '1', nombre: 'Ruta del Bosque Verde', distancia: '5.2 km', dificultad: 'Fácil' },
-  { id: '2', nombre: 'Sendero del Río Claro', distancia: '8.7 km', dificultad: 'Medio' },
-  { id: '3', nombre: 'Cumbre del Águila', distancia: '14.3 km', dificultad: 'Difícil' },
-  { id: '4', nombre: 'Valle de las Flores', distancia: '3.1 km', dificultad: 'Fácil' },
-  { id: '5', nombre: 'Ladera Rocosa', distancia: '11.0 km', dificultad: 'Medio' },
-];
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../config/firebase';
+import { seedDatabase } from '../utils/seedDatabase';
 
 const DIFICULTAD_COLOR = {
   Fácil: '#4ade80',
@@ -26,6 +22,28 @@ const DIFICULTAD_COLOR = {
 
 export default function RutasScreen({ navigation }) {
   const dispatch = useDispatch();
+  const [rutas, setRutas] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchRutas = async () => {
+    try {
+      setLoading(true);
+      const querySnapshot = await getDocs(collection(db, 'rutas'));
+      const rutasArray = [];
+      querySnapshot.forEach((doc) => {
+        rutasArray.push({ id: doc.id, ...doc.data() });
+      });
+      setRutas(rutasArray);
+    } catch (error) {
+      console.error("Error al cargar rutas:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRutas();
+  }, []);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -48,8 +66,12 @@ export default function RutasScreen({ navigation }) {
     <View style={styles.container}>
       <Text style={styles.title}>Rutas Disponibles</Text>
       <Text style={styles.subtitle}>Elige tu próxima aventura</Text>
-      <FlatList
-        data={RUTAS}
+
+      {loading ? (
+        <ActivityIndicator size="large" color="#4ade80" style={{ marginTop: 50 }} />
+      ) : (
+        <FlatList
+          data={rutas}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
@@ -69,6 +91,7 @@ export default function RutasScreen({ navigation }) {
           </TouchableOpacity>
         )}
       />
+      )}
     </View>
   );
 }

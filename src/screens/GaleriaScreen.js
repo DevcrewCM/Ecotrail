@@ -1,44 +1,73 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, Image } from 'react-native';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../config/firebase';
+import { useSelector } from 'react-redux';
 
-import { useSelector } from 'react-redux'
-import { retrieveImages } from '../store/slices/imageSlice';
+export default function GaleriaScreen({ route }) {
+  const ruta = route.params?.ruta ?? { id: '1', nombre: 'Ruta' };
+  const [fotos, setFotos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  // Si hay fotos locales en Redux (por la cámara), también las leemos
+  const imagesRedux = useSelector((state) => state.images || {});
+  const displayImagesRedux = Object.values(imagesRedux).filter((image) => image.route_id == ruta.id);
 
+  useEffect(() => {
+    const fetchFotos = async () => {
+      try {
+        const q = query(collection(db, 'galeria'), where('rutaId', '==', String(ruta.id)));
+        const querySnapshot = await getDocs(q);
+        const fotosArray = [];
+        querySnapshot.forEach((doc) => {
+          fotosArray.push({ id: doc.id, ...doc.data() });
+        });
+        setFotos(fotosArray);
+      } catch (error) {
+        console.error("Error cargando fotos:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-const FOTOS_MOCK = [
-  { id: '1', lugar: 'Mirador Norte', fecha: '12 May 2026' },
-  { id: '2', lugar: 'Puente de Piedra', fecha: '10 May 2026' },
-  { id: '3', lugar: 'Cascada del Bosque', fecha: '5 May 2026' },
-];
+    fetchFotos();
+  }, [ruta.id]);
 
-export default function GaleriaScreen({ navigation, route }) {
-  const ruta = route.params?.ruta ?? { nombre: 'Ruta' };
-  const images = useSelector((state) => state.images)
-
-  const displayImages = Object.values(images).filter((image) => image.route_id == ruta.id)
-
-  console.log("preeee: " + JSON.stringify(images))
-  console.log("post: " + JSON.stringify(displayImages))
+  // Combinamos las fotos de Firestore con las fotos locales recién tomadas
+  const todasLasFotos = [...fotos, ...displayImagesRedux];
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Galería</Text>
       <Text style={styles.subtitle}>{ruta.nombre}</Text>
-      <FlatList
-        data={displayImages}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.list}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <View>
-              <Image
-                style={styles.image}
-                source={item.uri}
-              />
+      
+      {loading ? (
+        <ActivityIndicator size="large" color="#4ade80" style={{ marginTop: 50 }} />
+      ) : (
+        <FlatList
+          data={todasLasFotos}
+          keyExtractor={(item, index) => String(item.id || index)}
+          contentContainerStyle={styles.list}
+          renderItem={({ item }) => (
+            <View style={styles.card}>
+              {item.uri ? (
+                <Image style={styles.image} source={{ uri: item.uri }} />
+              ) : item.urlFoto ? (
+                <Image style={styles.image} source={{ uri: item.urlFoto }} />
+              ) : null}
+              <View>
+                <Text style={styles.cardLugar}>{item.lugar || 'Foto Capturada'}</Text>
+                <Text style={styles.cardFecha}>{item.fecha || new Date().toLocaleDateString()}</Text>
+              </View>
             </View>
-          </View>
-        )}
-      />
+          )}
+          ListEmptyComponent={
+            <Text style={{ color: '#94a3b8', textAlign: 'center', marginTop: 20 }}>
+              Aún no hay fotos en esta ruta.
+            </Text>
+          }
+        />
+      )}
     </View>
   );
 }
@@ -88,5 +117,6 @@ const styles = StyleSheet.create({
   image: {
     width: 50,
     height: 50,
+    borderRadius: 8,
   },
 });

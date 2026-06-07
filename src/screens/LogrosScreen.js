@@ -1,40 +1,63 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
 import { useSelector } from 'react-redux';
-
-const LOGROS = [
-  { id: '1', titulo: 'Primer Paso', descripcion: 'Completa tu primera ruta', pasos: 1000 },
-  { id: '2', titulo: 'Explorador', descripcion: 'Completa 5 rutas distintas', pasos: 5000 },
-  { id: '3', titulo: 'Maratonista Verde', descripcion: 'Acumula 20 km en total', pasos: 10000 },
-  { id: '4', titulo: 'Fotógrafo Natural', descripcion: 'Captura 10 fotos en ruta', pasos: 100 },
-];
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../config/firebase';
 
 export default function LogrosScreen({ route }) {
   const ruta = route.params?.ruta ?? { nombre: 'Ruta' };
   const currentSteps = useSelector((state) => state.user.steps);
+  const [logros, setLogros] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLogros = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'logros'));
+        const logrosArray = [];
+        querySnapshot.forEach((doc) => {
+          logrosArray.push({ id: doc.id, ...doc.data() });
+        });
+        // Ordenar por pasos requeridos para que salgan en orden
+        logrosArray.sort((a, b) => a.pasos - b.pasos);
+        setLogros(logrosArray);
+      } catch (error) {
+        console.error("Error cargando logros:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLogros();
+  }, []);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Logros</Text>
       <Text style={styles.subtitle}>{ruta.nombre} - Llevas {currentSteps} pasos</Text>
-      <FlatList
-        data={LOGROS}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.list}
-        renderItem={({ item }) => {
-          const isDesbloqueado = currentSteps >= item.pasos;
-          
-          return (
-            <View style={[styles.card, !isDesbloqueado && styles.cardLocked]}>
-              <View style={styles.cardInfo}>
-                <Text style={styles.cardTitle}>{item.titulo}</Text>
-                <Text style={styles.cardDesc}>{item.descripcion}</Text>
-                <Text style={styles.cardPasos}>{item.pasos.toLocaleString()} pasos requeridos</Text>
+      
+      {loading ? (
+        <ActivityIndicator size="large" color="#4ade80" style={{ marginTop: 50 }} />
+      ) : (
+        <FlatList
+          data={logros}
+          keyExtractor={(item) => String(item.id)}
+          contentContainerStyle={styles.list}
+          renderItem={({ item }) => {
+            const isDesbloqueado = currentSteps >= item.pasos;
+            
+            return (
+              <View style={[styles.card, !isDesbloqueado && styles.cardLocked]}>
+                <View style={styles.cardInfo}>
+                  <Text style={styles.cardTitle}>{item.titulo}</Text>
+                  <Text style={styles.cardDesc}>{item.descripcion}</Text>
+                  <Text style={styles.cardPasos}>{item.pasos.toLocaleString()} pasos requeridos</Text>
+                </View>
               </View>
-            </View>
-          );
-        }}
-      />
+            );
+          }}
+        />
+      )}
     </View>
   );
 }
