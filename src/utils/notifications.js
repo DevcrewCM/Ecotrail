@@ -1,5 +1,20 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
+import Constants from 'expo-constants';
+
+/**
+ * Comprueba si la app está corriendo en Expo Go.
+ * Las notificaciones push remotas no funcionan en Expo Go desde SDK 53.
+ */
+function isExpoGo() {
+  return Constants.appOwnership === 'expo';
+}
+
+// Desactivar el auto-registro de tokens de push ANTES de que el módulo
+// lo intente hacer automáticamente. Esto evita el error en Expo Go.
+if (isExpoGo()) {
+  Notifications.setAutoServerRegistrationEnabledAsync(false).catch(() => {});
+}
 
 // Configurar cómo se muestran las notificaciones mientras la app está abierta
 Notifications.setNotificationHandler({
@@ -12,11 +27,16 @@ Notifications.setNotificationHandler({
 
 /**
  * Pide permisos de notificación y devuelve el Expo Push Token del dispositivo.
- * Este token es lo que se guarda en Firestore para poder enviar notificaciones
- * al usuario a través del servicio gratuito de Expo (Opción B).
+ * Si está en Expo Go, devuelve null y no intenta registrarse.
  */
 export async function registerForNotifications() {
   try {
+    // En Expo Go las notificaciones remotas no están soportadas desde SDK 53
+    if (isExpoGo()) {
+      console.log('Expo Go detectado: las notificaciones push remotas no están disponibles. Usando modo local.');
+      return null;
+    }
+
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
 
@@ -42,10 +62,10 @@ export async function registerForNotifications() {
 
     // Obtener el Expo Push Token (identificador único de este dispositivo)
     const tokenData = await Notifications.getExpoPushTokenAsync();
-    return tokenData.data; // Formato: "ExponentPushToken[xxxxxx]"
+    return tokenData.data;
 
   } catch (e) {
-    console.warn('No se pudo obtener el Expo Push Token:', e);
+    console.warn('No se pudo obtener el Expo Push Token (posiblemente Expo Go):', e.message);
     return null;
   }
 }

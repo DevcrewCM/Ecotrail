@@ -128,13 +128,19 @@ export default function LoginScreen({ navigation }) {
         dispatch(setToken(token));
         
         // Extraemos el uid del token (formato: token_firebase_UID)
-        const parts = token.split('_');
-        if (parts.length >= 3) {
-          const uid = parts[2];
-          dispatch(setUser({ email: 'usuario@biometrico.com', uid })); // Dummy email para que no falle Redux
-          await syncStepsFromFirestore(uid);
+        // El uid puede contener guiones bajos, así que separamos solo por los primeros dos '_'
+        const firstUnderscoreAfterPrefix = token.indexOf('_', 'token_firebase_'.length);
+        const uid = firstUnderscoreAfterPrefix > -1
+          ? token.slice('token_firebase_'.length)
+          : null;
+
+        if (!uid) {
+          Alert.alert('Sesión expirada', 'No se pudo recuperar la sesión. Inicia sesión con email y contraseña.');
+          return;
         }
-        
+
+        dispatch(setUser({ email: 'usuario@biometrico.com', uid }));
+        await syncStepsFromFirestore(uid);
         navigation.replace('Rutas');
       }
     } catch (error) {
