@@ -13,7 +13,7 @@ import {
 import * as LocalAuthentication from 'expo-local-authentication';
 import { saveSecureToken, getSecureToken } from '../utils/security';
 import { useDispatch } from 'react-redux';
-import { setUser, setToken, setSteps } from '../store/slices/userSlice';
+import { setUser, setToken, setSteps, setNotifiedLogros } from '../store/slices/userSlice';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../config/firebase';
@@ -34,10 +34,15 @@ export default function LoginScreen({ navigation }) {
         if (data.steps) {
           dispatch(setSteps(data.steps));
         }
+        // Restaurar logros ya notificados para no repetir avisos
+        if (data.notifiedLogros && Array.isArray(data.notifiedLogros)) {
+          dispatch(setNotifiedLogros(data.notifiedLogros));
+        }
       } else {
         // Inicializar documento para nuevo usuario
-        await setDoc(userDocRef, { steps: 0 }, { merge: true });
+        await setDoc(userDocRef, { steps: 0, notifiedLogros: [] }, { merge: true });
         dispatch(setSteps(0));
+        dispatch(setNotifiedLogros([]));
       }
     } catch (e) {
       console.error("Error sincronizando pasos:", e);
