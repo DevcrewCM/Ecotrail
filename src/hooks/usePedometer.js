@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addSteps, addNotifiedLogro } from '../store/slices/userSlice';
 import { doc, setDoc, collection, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import { sendLogroNotification } from '../utils/notifications';
+import { sendExpoPushNotification } from '../utils/notifications';
 
 export default function usePedometer() {
   const [isPedometerAvailable, setIsPedometerAvailable] = useState('checking');
@@ -12,6 +12,7 @@ export default function usePedometer() {
   const currentSteps = useSelector((state) => state.user.steps);
   const user = useSelector((state) => state.user.user);
   const notifiedLogros = useSelector((state) => state.user.notifiedLogros);
+  const expoPushToken = useSelector((state) => state.user.expoPushToken);
 
   // Usamos refs para acceder al valor más reciente dentro de los callbacks
   const stepsRef = useRef(currentSteps);
@@ -91,8 +92,8 @@ export default function usePedometer() {
       const logroAlcanzado = currentSteps >= logro.pasos;
 
       if (logroAlcanzado && !yaNotificado) {
-        // 1. Lanzar notificación push local
-        sendLogroNotification(logro.titulo, logro.descripcion);
+        // 1. Enviar notificación push via Expo Push Service (llega aunque la app esté cerrada)
+        sendExpoPushNotification(expoPushToken, logro.titulo, logro.descripcion);
 
         // 2. Registrar en Redux para no repetir el aviso
         dispatch(addNotifiedLogro(logro.id));

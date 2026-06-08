@@ -13,10 +13,11 @@ import {
 import * as LocalAuthentication from 'expo-local-authentication';
 import { saveSecureToken, getSecureToken } from '../utils/security';
 import { useDispatch } from 'react-redux';
-import { setUser, setToken, setSteps, setNotifiedLogros } from '../store/slices/userSlice';
+import { setUser, setToken, setSteps, setNotifiedLogros, setExpoPushToken } from '../store/slices/userSlice';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../config/firebase';
+import { registerForNotifications } from '../utils/notifications';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -31,21 +32,24 @@ export default function LoginScreen({ navigation }) {
       const userDoc = await getDoc(userDocRef);
       if (userDoc.exists()) {
         const data = userDoc.data();
-        if (data.steps) {
-          dispatch(setSteps(data.steps));
-        }
-        // Restaurar logros ya notificados para no repetir avisos
+        if (data.steps) dispatch(setSteps(data.steps));
         if (data.notifiedLogros && Array.isArray(data.notifiedLogros)) {
           dispatch(setNotifiedLogros(data.notifiedLogros));
         }
       } else {
-        // Inicializar documento para nuevo usuario
         await setDoc(userDocRef, { steps: 0, notifiedLogros: [] }, { merge: true });
         dispatch(setSteps(0));
         dispatch(setNotifiedLogros([]));
       }
+
+      // Obtener y guardar el Expo Push Token en Firestore
+      const pushToken = await registerForNotifications();
+      if (pushToken) {
+        dispatch(setExpoPushToken(pushToken));
+        await setDoc(doc(db, 'usuarios', uid), { expoPushToken: pushToken }, { merge: true });
+      }
     } catch (e) {
-      console.error("Error sincronizando pasos:", e);
+      console.error("Error sincronizando datos:", e);
     }
   };
 

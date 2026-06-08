@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
@@ -11,16 +11,11 @@ import LogrosScreen from '../screens/LogrosScreen';
 import CamaraScreen from '../screens/CamaraScreen';
 
 import usePedometer from '../hooks/usePedometer';
-import { registerForNotifications } from '../utils/notifications';
 
 const Stack = createStackNavigator();
 
 export default function AppNavigator() {
-  usePedometer(); // Inicia el rastreo de pasos
-
-  useEffect(() => {
-    registerForNotifications(); // Pide permisos de notificación al arrancar
-  }, []);
+  usePedometer();
 
   return (
     <NavigationContainer>

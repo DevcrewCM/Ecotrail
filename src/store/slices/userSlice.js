@@ -5,7 +5,8 @@ const initialState = {
   isAuthenticated: false,
   token: null,
   steps: 0,
-  notifiedLogros: [], // IDs de logros ya notificados (para no repetir el aviso)
+  notifiedLogros: [],
+  expoPushToken: null,
 };
 
 const userSlice = createSlice({
@@ -33,6 +34,9 @@ const userSlice = createSlice({
     setNotifiedLogros(state, action) {
       state.notifiedLogros = action.payload;
     },
+    setExpoPushToken(state, action) {
+      state.expoPushToken = action.payload;
+    },
     logout(state) {
       state.user = null;
       state.isAuthenticated = false;
@@ -42,5 +46,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { setUser, setToken, logout, addSteps, setSteps, addNotifiedLogro, setNotifiedLogros } = userSlice.actions;
+export const { setUser, setToken, logout, addSteps, setSteps, addNotifiedLogro, setNotifiedLogros, setExpoPushToken } = userSlice.actions;
 export default userSlice.reducer;
