@@ -2,22 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator, Image } from 'react-native';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import { useSelector } from 'react-redux';
 
 export default function GaleriaScreen({ route }) {
   const ruta = route.params?.ruta ?? { id: '1', nombre: 'Ruta' };
   const [fotos, setFotos] = useState([]);
   const [loading, setLoading] = useState(true);
-  
-  // Si hay fotos locales en Redux (por la cámara), también las leemos
-  const imagesRedux = useSelector((state) => state.images || {});
-  const displayImagesRedux = Object.values(imagesRedux).filter((image) => image.route_id == ruta.id);
 
   useEffect(() => {
     const fetchFotos = async () => {
       try {
-        const q = query(collection(db, 'galeria'), where('rutaId', '==', String(ruta.id)));
-        const querySnapshot = await getDocs(q);
+        const querySnapshot = await getDocs(collection(db, 'rutas', String(ruta.id), 'galeria'));
         const fotosArray = [];
         querySnapshot.forEach((doc) => {
           fotosArray.push({ id: doc.id, ...doc.data() });
@@ -33,9 +27,6 @@ export default function GaleriaScreen({ route }) {
     fetchFotos();
   }, [ruta.id]);
 
-  // Combinamos las fotos de Firestore con las fotos locales recién tomadas
-  const todasLasFotos = [...fotos, ...displayImagesRedux];
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Galería</Text>
@@ -45,16 +36,18 @@ export default function GaleriaScreen({ route }) {
         <ActivityIndicator size="large" color="#4ade80" style={{ marginTop: 50 }} />
       ) : (
         <FlatList
-          data={todasLasFotos}
-          keyExtractor={(item, index) => String(item.id || index)}
+          data={fotos}
+          keyExtractor={(item) => 'fs-' + item.id}
           contentContainerStyle={styles.list}
           renderItem={({ item }) => (
             <View style={styles.card}>
-              {item.uri ? (
-                <Image style={styles.image} source={{ uri: item.uri }} />
-              ) : item.urlFoto ? (
+              {item.urlFoto && !item.urlFoto.startsWith('ph://') ? (
                 <Image style={styles.image} source={{ uri: item.urlFoto }} />
-              ) : null}
+              ) : (
+                <View style={[styles.image, { backgroundColor: '#334155', justifyContent: 'center', alignItems: 'center' }]}>
+                  <Text style={{ fontSize: 10, color: '#94a3b8', textAlign: 'center' }}>Foto rota</Text>
+                </View>
+              )}
               <View>
                 <Text style={styles.cardLugar}>{item.lugar || 'Foto Capturada'}</Text>
                 <Text style={styles.cardFecha}>{item.fecha || new Date().toLocaleDateString()}</Text>

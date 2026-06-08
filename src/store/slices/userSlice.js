@@ -21,6 +21,9 @@ const userSlice = createSlice({
     addSteps(state, action) {
       state.steps += action.payload;
     },
+    setSteps(state, action) {
+      state.steps = action.payload;
+    },
     logout(state) {
       state.user = null;
       state.isAuthenticated = false;
@@ -29,5 +32,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { setUser, setToken, logout, addSteps } = userSlice.actions;
+export const { setUser, setToken, logout, addSteps, setSteps } = userSlice.actions;
 export default userSlice.reducer;

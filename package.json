@@ -16,6 +16,7 @@
     "expo-camera": "~17.0.10",
     "expo-image": "^56.0.9",
     "expo-local-authentication": "~17.0.8",
+    "expo-location": "~19.0.8",
     "expo-media-library": "~18.2.1",
     "expo-secure-store": "~15.0.8",
     "expo-sensors": "~15.0.8",

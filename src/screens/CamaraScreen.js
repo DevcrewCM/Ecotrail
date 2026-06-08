@@ -1,32 +1,31 @@
 import {
-  CameraType,
   CameraView,
   useCameraPermissions,
 } from "expo-camera";
-import { useRef, useState } from "react";
-import { Button, Pressable, StyleSheet, Text, View, Image } from "react-native";
-
-import AntDesign from "@expo/vector-icons/AntDesign";
-import Feather from "@expo/vector-icons/Feather";
+import * as MediaLibrary from 'expo-media-library';
+import { useRef, useState, useEffect } from "react";
+import { Button, Pressable, StyleSheet, Text, View, Alert } from "react-native";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-
-import { useDispatch } from 'react-redux';
-import { addImage } from '../store/slices/imageSlice';
-
+import { collection, addDoc } from 'firebase/firestore';
+import { db } from '../config/firebase';
 
 export default function CamaraScreen({ navigation, route }) {
   const ruta = route.params?.ruta ?? { nombre: 'Ruta' };
-  const dispatch = useDispatch();
 
   const [permission, requestPermission] = useCameraPermissions();
+  const [mediaPermission, requestMediaPermission] = MediaLibrary.usePermissions();
+  
   const ref = useRef(null);
   const [facing, setFacing] = useState("back");
 
-  const [uri, setUri] = useState("")
+  useEffect(() => {
+    if (mediaPermission?.status !== 'granted') {
+      requestMediaPermission();
+    }
+  }, [mediaPermission]);
+
   if (!permission) {
-    return (
-      <View />
-    );
+    return <View />;
   }
 
   if (!permission.granted) {
@@ -41,11 +40,39 @@ export default function CamaraScreen({ navigation, route }) {
   }
 
   const takePicture = async () => {
-    const photo = await ref.current?.takePictureAsync();
-    dispatch(addImage({ uri:photo.uri, route_id:ruta.id }))
-    setUri(photo.uri)
-    //navigation.goBack()
-    
+    try {
+      const photo = await ref.current?.takePictureAsync();
+      
+      if (!photo || !photo.uri) {
+        throw new Error('La foto no se capturó correctamente.');
+      }
+
+      let finalUri = photo.uri;
+
+      // Intentar guardar en la galería física del dispositivo
+      try {
+        if (mediaPermission?.granted) {
+          // Guardamos copia física en el carrete del usuario
+          await MediaLibrary.createAssetAsync(photo.uri);
+          // IMPORTANTE: NO usamos asset.uri (ph:// en iOS) porque <Image> crashea al intentar leerlo.
+          // Seguimos usando finalUri = photo.uri (file://) para guardarlo en la base de datos local.
+        }
+      } catch (mediaError) {
+        console.warn('No se pudo guardar en la galería física, usando URI temporal:', mediaError);
+      }
+      
+      // Guardar metadata en Firestore (Subcolección de la ruta activa)
+      await addDoc(collection(db, 'rutas', String(ruta.id), 'galeria'), {
+        urlFoto: finalUri,
+        lugar: 'Foto en Ruta',
+        fecha: new Date().toLocaleDateString()
+      });
+
+      Alert.alert('¡Foto Guardada!', 'La foto se ha guardado correctamente en la ruta.');
+    } catch (error) {
+      console.error('Error al guardar la foto:', error);
+      Alert.alert('Error', `No se pudo guardar la foto: ${error.message || error}`);
+    }
   };
 
   const toggleFacing = () => {
@@ -60,7 +87,6 @@ export default function CamaraScreen({ navigation, route }) {
           ref={ref}
           facing={facing}
           mute={false}
-          responsiveOrientationWhenOrientationLocked
         />
         <View style={styles.shutterContainer}>
           <Pressable onPress={takePicture}>
@@ -68,17 +94,13 @@ export default function CamaraScreen({ navigation, route }) {
               <View
                 style={[
                   styles.shutterBtn,
-                  {
-                    opacity: pressed ? 0.5 : 1,
-                  },
+                  { opacity: pressed ? 0.5 : 1 },
                 ]}
               >
                 <View
                   style={[
                     styles.shutterBtnInner,
-                    {
-                      backgroundColor: "white",
-                    },
+                    { backgroundColor: "white" },
                   ]}
                 />
               </View>
